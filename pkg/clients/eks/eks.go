@@ -196,6 +196,8 @@ func GenerateUpdateClusterConfigInput(name string, p *v1beta1.ClusterParameters)
 				Types:   types,
 			}
 		}
+
+		return u
 	}
 
 	// NOTE(muvaf): SecurityGroupIds and SubnetIds cannot be updated. They are
