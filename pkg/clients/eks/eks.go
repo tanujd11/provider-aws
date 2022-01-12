@@ -176,7 +176,7 @@ func CreatePatch(in *ekstypes.Cluster, target *v1beta1.ClusterParameters) (*v1be
 	return patch, nil
 }
 
-// GenerateUpdateClusterConfigInput from ClusterParameters.
+// GenerateUpdateClusterLoggingConfigInput from Logging.
 func GenerateUpdateClusterLoggingConfigInput(name string, p *v1beta1.Logging) *eks.UpdateClusterConfigInput {
 	u := &eks.UpdateClusterConfigInput{
 		Name: awsclients.String(name),
@@ -199,6 +199,7 @@ func GenerateUpdateClusterLoggingConfigInput(name string, p *v1beta1.Logging) *e
 	return u
 }
 
+// GenerateUpdateClusterResourceVPCConfigInput from VpcConfigRequest.
 func GenerateUpdateClusterResourceVPCConfigInput(name string, p v1beta1.VpcConfigRequest) *eks.UpdateClusterConfigInput {
 	u := &eks.UpdateClusterConfigInput{
 		Name: awsclients.String(name),
