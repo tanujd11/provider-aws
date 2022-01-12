@@ -177,37 +177,42 @@ func CreatePatch(in *ekstypes.Cluster, target *v1beta1.ClusterParameters) (*v1be
 }
 
 // GenerateUpdateClusterConfigInput from ClusterParameters.
-func GenerateUpdateClusterConfigInput(name string, p *v1beta1.ClusterParameters) *eks.UpdateClusterConfigInput {
+func GenerateUpdateClusterLoggingConfigInput(name string, p *v1beta1.Logging) *eks.UpdateClusterConfigInput {
 	u := &eks.UpdateClusterConfigInput{
 		Name: awsclients.String(name),
 	}
 
-	if p.Logging != nil {
-		u.Logging = &ekstypes.Logging{
-			ClusterLogging: make([]ekstypes.LogSetup, len(p.Logging.ClusterLogging)),
+	u.Logging = &ekstypes.Logging{
+		ClusterLogging: make([]ekstypes.LogSetup, len(p.ClusterLogging)),
+	}
+	for i, cl := range p.ClusterLogging {
+		types := make([]ekstypes.LogType, len(cl.Types))
+		for j, t := range cl.Types {
+			types[j] = ekstypes.LogType(t)
 		}
-		for i, cl := range p.Logging.ClusterLogging {
-			types := make([]ekstypes.LogType, len(cl.Types))
-			for j, t := range cl.Types {
-				types[j] = ekstypes.LogType(t)
-			}
-			u.Logging.ClusterLogging[i] = ekstypes.LogSetup{
-				Enabled: cl.Enabled,
-				Types:   types,
-			}
+		u.Logging.ClusterLogging[i] = ekstypes.LogSetup{
+			Enabled: cl.Enabled,
+			Types:   types,
 		}
+	}
 
-		return u
+	return u
+}
+
+func GenerateUpdateClusterResourceVPCConfigInput(name string, p v1beta1.VpcConfigRequest) *eks.UpdateClusterConfigInput {
+	u := &eks.UpdateClusterConfigInput{
+		Name: awsclients.String(name),
 	}
 
 	// NOTE(muvaf): SecurityGroupIds and SubnetIds cannot be updated. They are
 	// included in VpcConfigRequest probably because it is used in Create call
 	// as well.
 	u.ResourcesVpcConfig = &ekstypes.VpcConfigRequest{
-		EndpointPrivateAccess: p.ResourcesVpcConfig.EndpointPrivateAccess,
-		EndpointPublicAccess:  p.ResourcesVpcConfig.EndpointPublicAccess,
-		PublicAccessCidrs:     p.ResourcesVpcConfig.PublicAccessCidrs,
+		EndpointPrivateAccess: p.EndpointPrivateAccess,
+		EndpointPublicAccess:  p.EndpointPublicAccess,
+		PublicAccessCidrs:     p.PublicAccessCidrs,
 	}
+
 	return u
 }
 
